@@ -1,3 +1,6 @@
+using ChatService;
+using ChatService.Hubs;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSignalR();

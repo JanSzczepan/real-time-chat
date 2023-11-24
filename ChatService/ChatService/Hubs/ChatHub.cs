@@ -1,14 +1,10 @@
-﻿using System;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
+
+namespace ChatService.Hubs;
 
 public class ChatHub : Hub
 {
-    private readonly string _chatBot;
-
-    public ChatHub()
-    {
-        _chatBot = "MyChat Bot";
-    }
+    private const string ChatBot = "MyChat Bot";
 
     public async Task JoinRoom(UserConnection userConnection)
     {
@@ -17,7 +13,7 @@ public class ChatHub : Hub
             .Group(userConnection.Room)
             .SendAsync(
                 "ReceiveMessage",
-                _chatBot,
+                ChatBot,
                 $"{userConnection.User} has joined {userConnection.Room}"
             );
     }
