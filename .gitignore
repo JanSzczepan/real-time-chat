@@ -1,1 +1,40 @@
-.vs
+# Binaries and objects
+bin/
+obj/
+
+# Visual Studio user files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio directories
+.vs/
+
+# NuGet package files
+*.nupkg
+# NuGet packages directory
+packages/
+
+# Log files
+*.log
+*.log.*
+*.tmp
+*.tmp.*
+
+# External tools
+.idea/
+node_modules/
+dist/
+
+# Environment specific configuration files and certificates
+*.pfx
+appsettings.json
+appsettings.Development.json
+
+# Test results directories
+TestResults/
+
+# Docker
+Dockerfile.*
+docker-compose.*
