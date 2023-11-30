@@ -20,6 +20,11 @@ function App() {
                 setMessages((messages) => [...messages, { user, message }])
             })
 
+            connection.onclose(() => {
+                setConnection(undefined)
+                setMessages([])
+            })
+
             await connection.start()
             await connection.invoke('JoinRoom', { user, room })
             setConnection(connection)
@@ -36,6 +41,14 @@ function App() {
         }
     }
 
+    const closeConnection = async () => {
+        try {
+            await connection?.stop()
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return (
         <div className='app'>
             <h2>MyChat</h2>
@@ -45,6 +58,7 @@ function App() {
                 <Chat
                     messages={messages}
                     sendMessage={sendMessage}
+                    closeConnection={closeConnection}
                 />
             )}
         </div>

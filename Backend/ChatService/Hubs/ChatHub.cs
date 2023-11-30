@@ -34,4 +34,17 @@ public class ChatHub : Hub
                 .SendAsync("ReceiveMessage", userConnection.User, message);
         }
     }
+
+    public override Task OnDisconnectedAsync(Exception exception)
+    {
+        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+        {
+            _connections.Remove(Context.ConnectionId);
+            Clients
+                .Group(userConnection.Room)
+                .SendAsync("ReceiveMessage", ChatBot, $"{userConnection.User} has left");
+        }
+
+        return base.OnDisconnectedAsync(exception);
+    }
 }
