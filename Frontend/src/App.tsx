@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { HubConnectionBuilder, LogLevel, HubConnection } from '@microsoft/signalr'
-import { Lobby } from './components'
+import { Chat, Lobby } from './components'
+import { MessageInfo } from './ts/global'
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 function App() {
-    const [, setConnection] = useState<HubConnection>()
+    const [connection, setConnection] = useState<HubConnection>()
+    const [messages, setMessages] = useState<MessageInfo[]>([])
 
     const joinRoom = async (user: string, room: string) => {
         try {
@@ -15,7 +17,7 @@ function App() {
                 .build()
 
             connection.on('ReceiveMessage', (user, message) => {
-                console.log('message received: ', message, 'user: ', user)
+                setMessages((messages) => [...messages, { user, message }])
             })
 
             await connection.start()
@@ -26,10 +28,25 @@ function App() {
         }
     }
 
+    const sendMessage = async (message: string) => {
+        try {
+            await connection?.invoke('SendMessage', message)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return (
         <div className='app'>
             <h2>MyChat</h2>
-            <Lobby joinRoom={joinRoom} />
+            {!connection ? (
+                <Lobby joinRoom={joinRoom} />
+            ) : (
+                <Chat
+                    messages={messages}
+                    sendMessage={sendMessage}
+                />
+            )}
         </div>
     )
 }
