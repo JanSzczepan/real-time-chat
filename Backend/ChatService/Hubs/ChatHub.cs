@@ -12,6 +12,20 @@ public class ChatHub : Hub
         _connections = connections;
     }
 
+    public override Task OnDisconnectedAsync(Exception exception)
+    {
+        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+        {
+            _connections.Remove(Context.ConnectionId);
+            Clients
+                .Group(userConnection.Room)
+                .SendAsync("ReceiveMessage", ChatBot, $"{userConnection.User} has left");
+            SendUsersConnected(userConnection.Room);
+        }
+
+        return base.OnDisconnectedAsync(exception);
+    }
+
     public async Task JoinRoom(UserConnection userConnection)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
@@ -23,6 +37,7 @@ public class ChatHub : Hub
                 ChatBot,
                 $"{userConnection.User} has joined {userConnection.Room}"
             );
+        SendUsersConnected(userConnection.Room);
     }
 
     public async Task SendMessage(string message)
@@ -35,16 +50,10 @@ public class ChatHub : Hub
         }
     }
 
-    public override Task OnDisconnectedAsync(Exception exception)
+    public Task SendUsersConnected(string room)
     {
-        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
-        {
-            _connections.Remove(Context.ConnectionId);
-            Clients
-                .Group(userConnection.Room)
-                .SendAsync("ReceiveMessage", ChatBot, $"{userConnection.User} has left");
-        }
+        var users = _connections.Values.Where(c => c.Room == room).Select(c => c.User);
 
-        return base.OnDisconnectedAsync(exception);
+        return Clients.Group(room).SendAsync("UsersInRoom", users);
     }
 }

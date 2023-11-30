@@ -44,6 +44,6 @@ app.UseAuthorization();
 
 app.MapHub<ChatHub>("/chat");
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "Hello Chat!");
 
 app.Run();

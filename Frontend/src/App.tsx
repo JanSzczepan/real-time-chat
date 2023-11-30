@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 function App() {
     const [connection, setConnection] = useState<HubConnection>()
     const [messages, setMessages] = useState<MessageInfo[]>([])
+    const [users, setUsers] = useState<string[]>([])
 
     const joinRoom = async (user: string, room: string) => {
         try {
@@ -20,9 +21,14 @@ function App() {
                 setMessages((messages) => [...messages, { user, message }])
             })
 
+            connection.on('UsersInRoom', (users) => {
+                setUsers(users)
+            })
+
             connection.onclose(() => {
                 setConnection(undefined)
                 setMessages([])
+                setUsers([])
             })
 
             await connection.start()
@@ -57,6 +63,7 @@ function App() {
             ) : (
                 <Chat
                     messages={messages}
+                    users={users}
                     sendMessage={sendMessage}
                     closeConnection={closeConnection}
                 />
